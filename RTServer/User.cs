@@ -24,30 +24,19 @@ namespace RTServer
         public int OrgId { get => _orgId; set => _orgId = value; }
         public string UserName { get => _userName; set => _userName = value; }
         public string Password { get => _password; set => _password = value; }
-        public string logining(string username, string password)
-        {
-            if (login(username, password))
-            {
-                UserName = username;
-                return ($"login+true+{UserName}");
-            }
-            else
-            {
-                return ("login+false");
-            }
-        }
-        public bool login(string username, string password)
+
+        public string login(string username, string password)
         {
             DataTable table = new DataTable();
             string sqlQuery = $"SELECT UserName, [Password] FROM Users WHERE UserName = '{username}' and [Password] = '{password}'";
             table = database.getSqlQuery(sqlQuery);
             if (table.Rows.Count == 1)
             {
-                return true;
+                return ($"login+true+{UserName}");
             }
             else
             {
-                return false;
+                return ("login+false");
             }
         }
         internal string getUserData(string username)

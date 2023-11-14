@@ -19,12 +19,13 @@ class AsyncTwoWayServer
         StartServer();
         while (true)
         {
+            // Ожидание асинхронного подключения клиента
             TcpClient client = await server.AcceptTcpClientAsync();
             Console.WriteLine("Клиент подключен.");
 
+            // Запуск обработки клиента в отдельном потоке
             _ = Task.Run(() => HandleClient(client));
         }
-        //await Task.Delay(-1); // Бесконечное ожидание, чтобы сервер продолжал работать
     }
 
     static void StartServer()
@@ -34,6 +35,7 @@ class AsyncTwoWayServer
         Console.WriteLine("Сервер запущен. Ожидание подключений...");
     }
 
+    // Метод для обработки данных от клиента
     static async Task HandleClient(TcpClient client)
     {
         try
@@ -42,6 +44,7 @@ class AsyncTwoWayServer
 
             while (true)
             {
+                //Чтение
                 byte[] receivedBytes = new byte[1024];
                 int bytesRead = await stream.ReadAsync(receivedBytes, 0, receivedBytes.Length);
                 string receivedData = Encoding.UTF8.GetString(receivedBytes, 0, bytesRead);
@@ -49,7 +52,10 @@ class AsyncTwoWayServer
 
                 try
                 {
+                    //Обработка
                     string response = ProcessClientMessage(receivedData);
+
+                    //Отправка
                     byte[] responseData = Encoding.UTF8.GetBytes(response);
                     await stream.WriteAsync(responseData, 0, responseData.Length);
                     Console.WriteLine("Отправлено: " + response);
@@ -84,7 +90,7 @@ static string doAction(string response)
     {
         case "login":
             User user = new User();
-            return user.logining(responseArray[1], responseArray[2]);
+            return user.login(responseArray[1], responseArray[2]);
         case "signUp":
             User signUpUser = new User();
             return signUpUser.signUp(responseArray[1], responseArray[2], responseArray[3], responseArray[4], responseArray[5], responseArray[6]);
@@ -102,7 +108,7 @@ static string doAction(string response)
             return orgUsers.getUsers(responseArray[1]);
         
         default:
-            return "defautl";
+            return "error";
     }
 }
 }
