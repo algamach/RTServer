@@ -43,5 +43,22 @@ namespace RTServer
 
             return table;
         }
+        public bool insertSqlCommand(string queryString)
+        {
+            bool result;
+            SqlCommand insert_command = new SqlCommand(queryString, getConnection());
+
+            openConnection();
+            if (insert_command.ExecuteNonQuery() == 1)
+            {                
+                result = true;
+            }
+            else
+            {
+                result = false; 
+            }
+            closeConnection();
+            return result;
+        }
     }
 }

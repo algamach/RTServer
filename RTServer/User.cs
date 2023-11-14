@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.Design;
 using System.Data;
+using System.Data.SqlClient;
+using System.Security.Cryptography;
 
 namespace RTServer
 {
@@ -48,12 +50,59 @@ namespace RTServer
                 return false;
             }
         }
-
-        public string[] signUp(string lastName, string firstName, string fatherName, string userName, string password, int orgId)
+        internal string getUserData(string username)
         {
-            throw new Exception();
-        }
+            DataTable table = new DataTable();
+            UserName = username;
+            string sqlQuery = $"SELECT * FROM Users WHERE UserName = '{UserName}'";
+            table = database.getSqlQuery(sqlQuery);
 
+            Id = int.Parse(table.Rows[0]["Id"].ToString());
+            LastName = table.Rows[0]["LastName"].ToString();
+            FirstName= table.Rows[0]["FirstName"].ToString();
+            FatherName = table.Rows[0]["FatherName"].ToString();
+            OrgId= int.Parse(table.Rows[0]["OrgID"].ToString());
+
+            Organization org = new Organization();
+            string orgName = org.getNameFromId(OrgId);
+            string result = $"{UserName}+{LastName}+{FirstName}+{FatherName}+{orgName}";
+            return result;
+        }
+        private Boolean isUserExist(string userName)
+        {
+            DataTable table = new DataTable();
+            string sqlQuery = $"SELECT UserName FROM Users WHERE UserName = '{userName}'";
+            table = database.getSqlQuery(sqlQuery);
+
+            if (table.Rows.Count > 0)
+                return true;
+            else
+                return false;
+        }
+        public string signUp(string orgName, string lastName, string firstName, string fatherName, string userName, string password)
+        {
+            if ((userName == "") || (lastName == "") || (firstName == "") || (orgName == "") || (password == ""))
+            {
+                return "emptyError";
+            }
+            else if (isUserExist(userName))
+            {
+                return "usernameError";
+            }
+            else 
+            {
+                Organization org = new Organization();
+                int orgId = org.getIdFromName(orgName);
+                string queryString = $"INSERT INTO Users (LastName, FirstName, FatherName, UserName, [Password], OrgID) VALUES ('{lastName}', '{firstName}', '{fatherName}', '{userName}', '{password}', {orgId});";
+
+                bool result = database.insertSqlCommand(queryString);
+                if (result)
+                    return "success";
+                else
+                    return "error";
+            }           
+            
+        }
 
     }
 }

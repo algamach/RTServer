@@ -42,14 +42,24 @@ class AsyncTwoWayServer
 
             while (true)
             {
-                byte[] receivedBytes = new byte[256];
+                byte[] receivedBytes = new byte[1024];
                 int bytesRead = await stream.ReadAsync(receivedBytes, 0, receivedBytes.Length);
                 string receivedData = Encoding.UTF8.GetString(receivedBytes, 0, bytesRead);
                 Console.WriteLine("Получено от клиента: " + receivedData);
 
-                string response = ProcessClientMessage(receivedData);
-                byte[] responseData = Encoding.UTF8.GetBytes(response);
-                await stream.WriteAsync(responseData, 0, responseData.Length);
+                try
+                {
+                    string response = ProcessClientMessage(receivedData);
+                    byte[] responseData = Encoding.UTF8.GetBytes(response);
+                    await stream.WriteAsync(responseData, 0, responseData.Length);
+                    Console.WriteLine("Отправлено: " + response);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Ошибка "+ ex.Message);
+
+                }
+
             }
         }
         catch (Exception e)
@@ -75,7 +85,22 @@ static string doAction(string response)
         case "login":
             User user = new User();
             return user.logining(responseArray[1], responseArray[2]);
-
+        case "signUp":
+            User signUpUser = new User();
+            return signUpUser.signUp(responseArray[1], responseArray[2], responseArray[3], responseArray[4], responseArray[5], responseArray[6]);
+        case "bookSearch":
+            Book book = new Book();
+            return book.searchResult(responseArray[1]);
+        case "getUserData":
+            User userdata = new User();
+            return userdata.getUserData(responseArray[1]);
+        case "getAllOrg":
+            Organization org = new Organization();
+            return org.getAllNames();
+        case "getUsersFromOrg":
+            Organization orgUsers = new Organization();
+            return orgUsers.getUsers(responseArray[1]);
+        
         default:
             return "defautl";
     }
