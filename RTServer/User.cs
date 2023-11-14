@@ -22,7 +22,18 @@ namespace RTServer
         public int OrgId { get => _orgId; set => _orgId = value; }
         public string UserName { get => _userName; set => _userName = value; }
         public string Password { get => _password; set => _password = value; }
-
+        public string logining(string username, string password)
+        {
+            if (login(username, password))
+            {
+                UserName = username;
+                return ($"login+true+{UserName}");
+            }
+            else
+            {
+                return ("login+false");
+            }
+        }
         public bool login(string username, string password)
         {
             DataTable table = new DataTable();
@@ -43,17 +54,6 @@ namespace RTServer
             throw new Exception();
         }
 
-        public string logining(string username, string password)
-        {
-            if (login(username, password))
-            {
-                UserName = username;
-                return($"login+true+{UserName}");
-            }
-            else
-            {
-                return ("login+false");
-            }
-        }
+
     }
 }

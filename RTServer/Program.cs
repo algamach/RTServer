@@ -17,13 +17,14 @@ class AsyncTwoWayServer
     static async Task Main()
     {
         StartServer();
+        while (true)
+        {
+            TcpClient client = await server.AcceptTcpClientAsync();
+            Console.WriteLine("Клиент подключен.");
 
-        TcpClient client = await server.AcceptTcpClientAsync();
-        Console.WriteLine("Клиент подключен.");
-
-        _ = Task.Run(() => HandleClient(client));
-
-        await Task.Delay(-1); // Бесконечное ожидание, чтобы сервер продолжал работать
+            _ = Task.Run(() => HandleClient(client));
+        }
+        //await Task.Delay(-1); // Бесконечное ожидание, чтобы сервер продолжал работать
     }
 
     static void StartServer()
